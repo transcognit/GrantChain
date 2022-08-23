@@ -1,7 +1,12 @@
 import React from "react";
 import clsx from "clsx";
-import VpnKeyIcon from "@material-ui/icons/VpnKey";
+
+import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
+import ContactsIcon from "@material-ui/icons/Contacts";
+
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
@@ -16,9 +21,11 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import UserLogin from "./UserLogin";
-import UserSignup from "./UserSignup";
+import PhoneAndroidIcon from "@material-ui/icons/PhoneAndroid";
+
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import AddTask from "./AddTask";
+import TaskUpdate from "./TaskUpdate";
 
 const drawerWidth = 240;
 
@@ -84,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function HomePage(props) {
+export default function OrgAdminHomePage(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
@@ -95,11 +102,6 @@ export default function HomePage(props) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  function settingRoleFun(roleValue, userName) {
-    props.setRoleFun(roleValue, userName);
-    console.log("Homepage",roleValue);
-  }
 
   return (
     <Router>
@@ -124,7 +126,7 @@ export default function HomePage(props) {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" noWrap style={{ color: "white" }}>
-              Grant Chain
+            Grant Chain
             </Typography>
           </Toolbar>
         </AppBar>
@@ -148,25 +150,32 @@ export default function HomePage(props) {
           </div>
           <Divider />
           <List>
-            <Link to="/" style={{ color: 'inherit', textDecoration: 'inherit'}}>
-              <ListItem button key="Login">
+            <Link
+              to="/"
+              style={{ color: "inherit", textDecoration: "inherit" }}
+            >
+              <ListItem button key="Create Task">
                 <ListItemIcon>
-                  <VpnKeyIcon />
+                  <ContactsIcon />
                 </ListItemIcon>
-                <ListItemText primary="Login" />
+                <ListItemText primary="Create Task" />
               </ListItem>
             </Link>
 
-            <Link to="/signup" style={{ color: 'inherit', textDecoration: 'inherit'}}>
-              <ListItem button key="Sign Up">
+            <Link
+              to="/TaskUpdate"
+              style={{ color: "inherit", textDecoration: "inherit" }}
+            >
+              <ListItem button key="Update Task">
                 <ListItemIcon>
                   <PersonAddIcon />
                 </ListItemIcon>
-                <ListItemText primary="Sign Up" />
+                <ListItemText primary="Update Task" />
               </ListItem>
             </Link>
-          </List>
 
+
+          </List>
           <Divider />
         </Drawer>
         <main className={classes.content}>
@@ -174,10 +183,10 @@ export default function HomePage(props) {
 
           <Switch>
             <Route exact path="/">
-              <UserLogin myContractObj={props.myContractObj} userLoginFun={settingRoleFun} payAddress={props.payAddress} />
+              <AddTask myContractObj={props.myContractObj} userName={props.userName} payAddress={props.payAddress} />
             </Route>
-            <Route path="/signup">
-              <UserSignup myContractObj={props.myContractObj} payAddress={props.payAddress} />
+            <Route path="/TaskUpdate">
+              <TaskUpdate myContractObj={props.myContractObj} userName={props.userName} payAddress={props.payAddress} />
             </Route>
           </Switch>
         </main>

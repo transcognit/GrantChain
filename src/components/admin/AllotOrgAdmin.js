@@ -7,9 +7,8 @@ import Container from "@material-ui/core/Container";
 
 import { Table, Divider } from "antd";
 import "antd/dist/antd.css";
-import { TextField } from "@material-ui/core";
 
-const axios = require('axios').default
+const axios = require("axios").default;
 
 const columns = [
   {
@@ -38,38 +37,23 @@ const columns = [
 
 const columnsT2 = [
   {
-    title: "Task ID",
-    dataIndex: "idTask",
+    title: "SL No.",
+    dataIndex: "no",
     render: (text) => <a>{text}</a>,
   },
   {
-    title: "Task Name",
-    dataIndex: "taskName",
-  },
-  {
-    title: "Task Loaction",
-    dataIndex: "taskLocation",
-  },
-  {
-    title: "Requirement",
-    dataIndex: "taskRequirements",
-  },
-  {
-    title: "Allocation",
-    dataIndex: "taskAllocation",
-  },
-  {
-    title: "Task Completion",
-    dataIndex: "taskCompletion",
+    title: "Email ID",
+    dataIndex: "emailid",
   },
 ];
 
-export default function TaskUpdate(props) {
-  const [idTask, setidTask] = useState("");
+export default function AllotOrgAdmin(props) {
+  const [usermails, setusermaeil] = useState("");
   const [compaignList, setCompaignList] = useState([]);
   const [compaignnID, setcompaignnID] = useState([]);
 
   useEffect(() => {
+    getUserDetails();
     getCampaignDetails();
   }, []);
 
@@ -79,8 +63,7 @@ export default function TaskUpdate(props) {
 
   const getCampaignDetails = async () => {
     let campaignList = [];
-
-    let campaginData = await axios.get('http://127.0.0.1:3001/getCampagins')
+    let campaginData = await axios.get("http://127.0.0.1:3001/getCampagins");
 
     campaginData.data.map((value, key) => {
       let newcampaignList = {
@@ -92,32 +75,26 @@ export default function TaskUpdate(props) {
         details: value.details,
       };
       campaignList.push(newcampaignList);
-    })
+    });
     // console.log("=======================>hai", campaignList);
     setCompaignList(campaignList);
   };
 
-  const getTaskDetails = async (campainID) => {
-    let projectData = await axios.post('http://127.0.0.1:3001/findProject', {
-      campaginid: campainID,
-    })
+  const getUserDetails = async () => {
+    let userData = await axios.get("http://127.0.0.1:3001/getorgAdmins");
 
-    console.log("Project Data: ", projectData)
+    console.log("AllotOrgAdmin: ", props.userName);
 
     let taskDetailsList = [];
 
-    projectData.data.map((value, key) => {
+    userData.data.map((value, key) => {
       let newTask = {
         key: key,
-        idTask: value.projectid,
-        taskName: value.projectname,
-        taskLocation: value.location,
-        taskRequirements: value.budget,
-        taskAllocation: value.allocated,
-        taskCompletion: value.completion,
+        no: key,
+        emailid: value.emailid,
       };
       taskDetailsList.push(newTask);
-    })
+    });
 
     settaskDetails(taskDetailsList);
   };
@@ -127,22 +104,16 @@ export default function TaskUpdate(props) {
       let campainID = selectedRows[0].idCapaign;
       console.log("table", selectedRows[0].idCapaign);
       setcompaignnID(campainID);
-      getTaskDetails(campainID);
-      
     },
   };
 
   const rowSelection1 = {
     onChange: (selectedRowKeys, selectedRows) => {
       let taskID = selectedRows[0].idTask;
-      console.log("table", selectedRows[0].idTask);
-      setidTask(taskID);
-      settaskCompletion(parseInt(selectedRows[0].taskCompletion));
+      console.log("table", selectedRows[0].emailid);
+      setusermaeil(selectedRows[0].emailid);
     },
   };
-
-  const myContract = props.myContractObj;
-  const ethereum = window.ethereum;
 
   const useStyles = makeStyles((theme) => ({
     paper: {
@@ -164,24 +135,21 @@ export default function TaskUpdate(props) {
 
   const sliderChangeHanlde = (event) => {
     settaskCompletion(event.target.value);
-    console.log(event.target.value)
-  }
+    console.log(event.target.value);
+  };
 
-  const submitHandler = async() => {
-
-    let projectData = await axios.post('http://127.0.0.1:3001/updateProject', {
-      projectid: idTask,taskCompletion: taskCompletion,
-    })
-    getTaskDetails(compaignnID);
-  }
-
-
+  const submitHandler = async () => {
+    await axios.post("http://127.0.0.1:3001/allotAdmin", {
+      emailid: usermails,
+      campaginid: compaignnID,
+    });
+  };
 
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
         <Typography component="h1" variant="h5">
-          Update Task Progress
+          Allot Campagin Admin
         </Typography>
 
         <div style={{ width: 1000 }}>
@@ -211,22 +179,6 @@ export default function TaskUpdate(props) {
         </div>
         <br />
         <br />
-        <Typography variant="h5" gutterBottom>
-          Progress
-        </Typography>
-        <TextField
-            autoComplete="taskname"
-            name="taskname"
-            variant="outlined"
-            value={taskCompletion}
-            required
-            fullWidth
-            id="taskname"
-            label="Enter new progress"
-            autoFocus
-            onChange={sliderChangeHanlde}
-            className={classes.input}
-          />
 
         <Button
           type="submit"
@@ -236,7 +188,7 @@ export default function TaskUpdate(props) {
           onClick={submitHandler}
           className={classes.submit}
         >
-          Update Task
+          Allot
         </Button>
       </div>
     </Container>

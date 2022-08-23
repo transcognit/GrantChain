@@ -13,15 +13,12 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import { Table, Divider } from 'antd'
 import 'antd/dist/antd.css'
 
+const axios = require('axios').default
+
 const columnsT2 = [
   {
     title: 'Certificate ID',
     dataIndex: 'idDonation',
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: 'Name of campaign',
-    dataIndex: 'nameCapaign',
     render: (text) => <a>{text}</a>,
   },
   {
@@ -32,6 +29,7 @@ const columnsT2 = [
 export default function DonationHistory(props) {
   const [certificateID, setcertificateID] = useState('')
   const [campaignName, setcampaignName] = useState('')
+  const [amount, setamount] = useState('')
 
   useEffect(() => {
     getDonationDetails()
@@ -40,24 +38,22 @@ export default function DonationHistory(props) {
   const [donationDetails, setdonationDetails] = useState([])
 
   const getDonationDetails = async () => {
-    let donationCount = await myContract.methods.donationCount().call()
-
     let donationList = []
 
-    for (let i = 0; i < donationCount; i++) {
-      let donationdatas = await myContract.methods.donationDetails(i).call()
-      console.log(donationdatas.username, props.username)
-      if (donationdatas.username == props.userName) {
-        let newdonationList = {
-          key: i,
-          idDonation: i,
-          nameCapaign: donationdatas.campaignName,
-          amount: donationdatas.amount,
-        }
-        donationList.push(newdonationList)
+    let donationData = await axios.post('http://127.0.0.1:3001/findDonation', {
+      emailid: props.userName,
+    })
+
+    donationData.data.map((value, key) => {
+      let newdonationList = {
+        key: key,
+        idDonation: value.donaitionid,
+        amount: value.amount,
       }
-    }
-    console.log('=======================>hai', donationList)
+      donationList.push(newdonationList)
+    })
+
+    console.log('=======================>hai', donationData.data)
     setdonationDetails(donationList)
   }
 
@@ -65,13 +61,12 @@ export default function DonationHistory(props) {
     onChange: (selectedRowKeys, selectedRows) => {
       let cid = selectedRows[0].idDonation
       let campaignNme = selectedRows[0].nameCapaign
+      let amount = selectedRows[0].amount
       setcertificateID(cid)
       setcampaignName(campaignNme)
+      setamount(amount)
     },
   }
-
-  const myContract = props.myContractObj
-  const ethereum = window.ethereum
 
   const useStyles = makeStyles((theme) => ({
     paper: {
@@ -94,7 +89,7 @@ export default function DonationHistory(props) {
   const [open, setOpen] = React.useState(false)
 
   const handleClickOpen = () => {
-      setOpen(true)
+    setOpen(true)
   }
 
   const handleClose = () => {
@@ -149,7 +144,7 @@ export default function DonationHistory(props) {
               </Typography>
               <Typography gutterBottom>
                 In recogition of your donation to help the participants of the{' '}
-                <b>{campaignName}</b> campaign.
+                <b>Grant Chain</b> platfrom for the amount of <b>{amount}</b>.
               </Typography>
               <Typography gutterBottom>
                 Certificate ID: # <b>{certificateID}</b>

@@ -146,7 +146,7 @@ export default function SupplierHomePage(props) {
           </div>
           <Divider />
           <List>
-            <Link
+            {/* <Link
               to="/"
               style={{ color: 'inherit', textDecoration: 'inherit' }}
             >
@@ -156,7 +156,7 @@ export default function SupplierHomePage(props) {
                 </ListItemIcon>
                 <ListItemText primary="Dashboard" />
               </ListItem>
-            </Link>
+            </Link> */}
 
             <Link
               to="/Donation"
@@ -188,14 +188,14 @@ export default function SupplierHomePage(props) {
         <main className={classes.content}>
           <div className={classes.toolbar} />
           <Switch>
-            <Route exact path="/">
+            {/* <Route exact path="/">
               <SupplierDashBoard
                 myContractObj={props.myContractObj}
                 we3Obj={props.we3Obj}
                 userName={props.userName}
                 payAddress={props.payAddress}
               />
-            </Route>
+            </Route> */}
             <Route path="/Donation">
               <Donation
                 myContractObj={props.myContractObj}
@@ -204,7 +204,7 @@ export default function SupplierHomePage(props) {
                 payAddress={props.payAddress}
               />
             </Route>
-            <Route path="/DonationHistory">
+            <Route path="/">
               <ComponentList
                 myContractObj={props.myContractObj}
                 userName={props.userName}

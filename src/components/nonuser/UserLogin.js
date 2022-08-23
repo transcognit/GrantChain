@@ -1,36 +1,38 @@
-import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from "@material-ui/lab/Alert";
-import { Container } from "@material-ui/core";
+import React, { useState } from 'react'
+import { makeStyles } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
+import Typography from '@material-ui/core/Typography'
+import TextField from '@material-ui/core/TextField'
+import Snackbar from '@material-ui/core/Snackbar'
+import MuiAlert from '@material-ui/lab/Alert'
+import { Container } from '@material-ui/core'
+
+const axios = require('axios').default
 
 export default function UserLogin(props) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false)
 
-  const [userName, setUserName] = useState();
-  const [password, setPassword] = useState();
+  const [userName, setUserName] = useState()
+  const [password, setPassword] = useState()
 
   const userNameChangeHandler = (event) => {
-    setUserName(event.target.value);
-  };
+    setUserName(event.target.value)
+  }
 
   const passwordChangeHandler = (event) => {
-    setPassword(event.target.value);
-  };
+    setPassword(event.target.value)
+  }
 
   function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} variant="filled" {...props} />
   }
 
   const useStyles = makeStyles((theme) => ({
     paper: {
       marginTop: theme.spacing(8),
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     },
 
     input: {
@@ -39,45 +41,43 @@ export default function UserLogin(props) {
 
     submit: {
       margin: theme.spacing(3, 0, 2),
-      width: "50%",
+      width: '50%',
     },
-  }));
+  }))
 
-  const classes = useStyles();
-  const myContract = props.myContractObj;
-  const ethereum = window.ethereum;
+  const classes = useStyles()
+  const myContract = props.myContractObj
+  const ethereum = window.ethereum
 
   const enableMetaMask = async () => {
     // await ethereum.request({ method: "eth_requestAccounts" });
-    console.log(props.payAddress);
-  };
+    console.log(props.payAddress)
+  }
 
   const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
+    if (reason === 'clickaway') {
+      return
     }
-    setOpen(false);
-  };
+    setOpen(false)
+  }
 
   const submitHandler = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    const userData = await myContract.methods
-      .userDetails(userName)
-      .call();
-    console.log("User Type:", userData);
-    if (
-      userData.userType === "User" ||
-      userData.userType === "Admin"
-    ) {
-      props.userLoginFun(userData.userType, userName);
+    let userData = await axios.post('http://127.0.0.1:3001/findUser', {
+      emailid: userName,
+    })
+    
+    console.log('User Type:', userData.data[0].type)
+    if (userData.data[0].type === 'User' || userData.data[0].type === 'Admin' || userData.data[0].type === 'OrgAdmin') {
+      props.userLoginFun(userData.data[0].type, userName)
     } else {
-      setOpen(true);
-      props.userLoginFun("home", userName);
+      setOpen(true)
+      props.userLoginFun('home', userName)
     }
 
-    setOpen(true);
-  };
+    setOpen(true)
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -115,7 +115,6 @@ export default function UserLogin(props) {
             fullWidth
             variant="contained"
             color="primary"
-            onClick={enableMetaMask}
             className={classes.submit}
           >
             Login
@@ -131,5 +130,5 @@ export default function UserLogin(props) {
         </div>
       </div>
     </Container>
-  );
+  )
 }

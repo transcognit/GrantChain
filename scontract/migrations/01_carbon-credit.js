@@ -1,5 +1,5 @@
-const CarbonCredit = artifacts.require("CarbonCredit");
+const GrantChain = artifacts.require("GrantChain");
 
 module.exports = function (deployer) {
-  deployer.deploy(CarbonCredit);
+  deployer.deploy(GrantChain);
 };

@@ -8,6 +8,8 @@ import Container from "@material-ui/core/Container";
 import { Table, Divider } from "antd";
 import "antd/dist/antd.css";
 import { TextField } from "@material-ui/core";
+import Snackbar from '@material-ui/core/Snackbar'
+import MuiAlert from '@material-ui/lab/Alert'
 
 const axios = require('axios').default
 
@@ -76,20 +78,21 @@ export default function TaskUpdate(props) {
   const [taskCompletion, settaskCompletion] = useState();
   const [taskDetails, settaskDetails] = useState([]);
   // const [sliderValue, setslidervalue] = useState();
+  const [open, setOpen] = React.useState(false)
 
   const getCampaignDetails = async () => {
     let campaignList = [];
 
-    let campaginData = await axios.get('http://127.0.0.1:3001/getCampagins')
+    let campaginData = await axios.post('http://127.0.0.1:3001/getOrgCampagin', {userName: props.userName});
 
     campaginData.data.map((value, key) => {
       let newcampaignList = {
         key: key,
-        idCapaign: value.campaginid,
-        nameCapaign: value.campaginname,
-        startDate: value.startdata,
-        endDate: value.enddate,
-        details: value.details,
+        idCapaign: value[0].campaginid,
+        nameCapaign: value[0].campaginname,
+        startDate: value[0].startdata,
+        endDate: value[0].enddate,
+        details: value[0].details,
       };
       campaignList.push(newcampaignList);
     })
@@ -172,16 +175,28 @@ export default function TaskUpdate(props) {
     let projectData = await axios.post('http://127.0.0.1:3001/updateProject', {
       projectid: idTask,taskCompletion: taskCompletion,
     })
+    console.log(compaignnID);
+    setOpen(true);
     getTaskDetails(compaignnID);
   }
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
+    }
+    setOpen(false)
+  }
+
+  function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />
+  }
 
 
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
         <Typography component="h1" variant="h5">
-          Update Task Progress
+          Update Project Progress
         </Typography>
 
         <div style={{ width: 1000 }}>
@@ -238,6 +253,11 @@ export default function TaskUpdate(props) {
         >
           Update Task
         </Button>
+        <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="success">
+          Project Created Successfull
+          </Alert>
+        </Snackbar>
       </div>
     </Container>
   );

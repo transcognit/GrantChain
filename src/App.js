@@ -10,6 +10,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import Web3 from "web3";
 
 import SupplierHomePage from "./components/doner/UserHomePage";
+import OrgAdminHomePage from "./components/orgadmin/OrgAdminHomePage";
 
 const App = () => {
   const [open, setOpen] = React.useState(false);
@@ -28,9 +29,8 @@ const App = () => {
   };
 
   const [loginState, setLoginState] = useState("home");
-  const [userName, setUserName] = useState();
+  const [suserName, setUserName] = useState();
 
-  const ethereum = window.ethereum;
 
   const MyContractJSON = require("./contractjson/GrantChain.json");
 
@@ -45,7 +45,7 @@ const App = () => {
   function userLogin(userRole, userName) {
     setLoginState(userRole);
     setUserName(userName);
-    console.log(userName);
+    console.log("App.js", userName);
   }
 
   if (loginState === "home") {
@@ -64,7 +64,7 @@ const App = () => {
   } else if (loginState === "User") {
     return (
       <div className="App">
-        <SupplierHomePage myContractObj={myContract} we3Obj={web3} userName={userName} payAddress={payAddress} />
+        <SupplierHomePage myContractObj={myContract} we3Obj={web3} userName={suserName} payAddress={payAddress} />
         <div>
           <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
             <Alert onClose={handleClose} severity="error">
@@ -77,7 +77,20 @@ const App = () => {
   } else if (loginState === "Admin") {
     return (
       <div className="App">
-        <AdminHomePage myContractObj={myContract} we3Obj={web3} contractAddress={contractAddress} payAddress={payAddress} />
+        <AdminHomePage myContractObj={myContract} we3Obj={web3} userName={suserName}  contractAddress={contractAddress} payAddress={payAddress} />
+        <div>
+          <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+            <Alert onClose={handleClose} severity="error">
+              Invalid User
+            </Alert>
+          </Snackbar>
+        </div>
+      </div>
+    );
+  } else if (loginState === "OrgAdmin") {
+    return (
+      <div className="App">
+        <OrgAdminHomePage myContractObj={myContract} we3Obj={web3} userName={suserName} contractAddress={contractAddress} payAddress={payAddress} />
         <div>
           <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
             <Alert onClose={handleClose} severity="error">

@@ -29,6 +29,7 @@ import AdminDashBoard from "./AdminDashBoard";
 import ViewDetails from "./ViewDetails";
 import AddTask from "./AddTask";
 import TaskUpdate from "./TaskUpdate";
+import AllotOrgAdmin from "./AllotOrgAdmin";
 
 const drawerWidth = 240;
 
@@ -177,7 +178,7 @@ export default function AdminHomePage(props) {
               </ListItem>
             </Link>
 
-            <Link
+            {/* <Link
               to="/CreateTask"
               style={{ color: "inherit", textDecoration: "inherit" }}
             >
@@ -187,17 +188,17 @@ export default function AdminHomePage(props) {
                 </ListItemIcon>
                 <ListItemText primary="Create Task" />
               </ListItem>
-            </Link>
+            </Link> */}
 
             <Link
-              to="/TaskUpdate"
+              to="/AllotOrgAdmin"
               style={{ color: "inherit", textDecoration: "inherit" }}
             >
-              <ListItem button key="Update Task">
+              <ListItem button key="Allot Campaign Admin">
                 <ListItemIcon>
                   <PersonAddIcon />
                 </ListItemIcon>
-                <ListItemText primary="Update Task" />
+                <ListItemText primary="Allot Campaign Admin" />
               </ListItem>
             </Link>
 
@@ -230,11 +231,11 @@ export default function AdminHomePage(props) {
             <Route path="/AddCompaign">
               <AddCompaign myContractObj={props.myContractObj} payAddress={props.payAddress} />
             </Route>
-            <Route path="/CreateTask">
+            {/* <Route path="/CreateTask">
               <AddTask myContractObj={props.myContractObj} payAddress={props.payAddress} />
-            </Route>
-            <Route path="/TaskUpdate">
-              <TaskUpdate myContractObj={props.myContractObj} payAddress={props.payAddress} />
+            </Route> */}
+            <Route path="/AllotOrgAdmin">
+              <AllotOrgAdmin myContractObj={props.myContractObj} userName={props.userName} payAddress={props.payAddress} />
             </Route>
             <Route path="/ViewDetails">
               <ViewDetails myContractObj={props.myContractObj} payAddress={props.payAddress} />

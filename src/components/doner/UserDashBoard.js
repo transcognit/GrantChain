@@ -135,7 +135,7 @@ export default function SupplierDashBoard(props) {
   const getEventDetails = async () => {
     console.log('Web3: ', myContract)
     myContract.getPastEvents(
-      'SystemLog2',
+      'SystemLog',
       {
         filter: { EventTriggeredBy: props.payAddress },
         fromBlock: 0,

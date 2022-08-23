@@ -46,12 +46,12 @@ export default function AddTask(props) {
 
   const getCampaignList = async () => {
     let campaignList = [];
-
-    let response = await axios.get('http://127.0.0.1:3001/getCampagins');
+    console.log("Add Task", props.userName)
+    let response = await axios.post('http://127.0.0.1:3001/getOrgCampagin', {userName: props.userName});
 
     campaignList = response.data;
 
-    console.log('=======================>hai', campaignList);
+    // console.log('Add task data', campaignList[0][0]);
     setCompaignList(campaignList);
   };
 
@@ -128,9 +128,9 @@ export default function AddTask(props) {
             onChange={compaignChangeHandler}
             className={classes.input}
           >
-            {compaignList.map((data) => (
-              <MenuItem key={data.campaginid} value={data.campaginid}>
-                {data.campaginname}
+            {compaignList.map((data, key) => (
+              <MenuItem key={key} value={data[0].campaginid}>
+                {data[0].campaginname}
               </MenuItem>
             ))}
           </Select>

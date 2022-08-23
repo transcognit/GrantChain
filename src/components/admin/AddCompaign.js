@@ -5,10 +5,14 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import Snackbar from '@material-ui/core/Snackbar'
+import MuiAlert from '@material-ui/lab/Alert'
+
+const axios = require('axios').default;
 
 export default function AddCompaign(props) {
-  const myContract = props.myContractObj;
-  const ethereum = window.ethereum;
+
+  const [open, setOpen] = React.useState(false)
 
   const useStyles = makeStyles((theme) => ({
     paper: {
@@ -35,12 +39,32 @@ export default function AddCompaign(props) {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    console.log(props.payAddress);
-    const infoValue = await myContract.methods
-      .newCampaign(name, startDate, endDate, details)
-      .send({ from: props.payAddress, gas: 999999 });
-    console.log(infoValue);
+
+    axios.post('http://127.0.0.1:3001/createCampagin', {
+      "campaginname": name,
+      "startdata": startDate,
+      "enddate": endDate,
+      "details": details
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    setOpen(true)
   };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
+    }
+    setOpen(false)
+  }
+
+  function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />
+  }
 
   const nameChangeHandler = (event) => {
     setName(event.target.value);
@@ -135,6 +159,11 @@ export default function AddCompaign(props) {
             Create Campaign
           </Button>
         </form>
+        <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="success">
+          Project Created Successfull
+          </Alert>
+        </Snackbar>
       </div>
     </Container>
   );

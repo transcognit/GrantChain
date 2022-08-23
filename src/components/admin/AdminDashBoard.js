@@ -1,10 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 
 import TextField from "@material-ui/core/TextField";
@@ -17,20 +13,36 @@ import Typography from "@material-ui/core/Typography";
 
 import { Table, Divider } from "antd";
 import "antd/dist/antd.css";
-
+const axios = require("axios").default;
 const columns = [
   {
-    title: "Event Action",
-    dataIndex: "EventAction",
+    title: "SL No.",
+    dataIndex: "slno",
   },
   {
-    title: "Timestamp",
-    dataIndex: "DateTime",
+    title: "Email ID",
+    dataIndex: "name",
+    render: (text) => <a>{text}</a>,
+  },
+  {
+    title: "First Name",
+    dataIndex: "firstname",
+  },
+  {
+    title: "Last Name",
+    dataIndex: "lastname",
+  },
+  {
+    title: "Contribution",
+    dataIndex: "contribution",
+  },
+  {
+    title: "Alloted/Not",
+    dataIndex: "alloted",
   },
 ];
 
 export default function AdminDashBoard(props) {
-  const ethereum = window.ethereum;
   const myContract = props.myContractObj;
 
   const useStylesGrid = makeStyles((theme) => ({
@@ -65,85 +77,33 @@ export default function AdminDashBoard(props) {
     },
   }));
   const classes = useStyles();
-  const classesGride = useStylesGrid();
-  const [eventDetails, seteventDetails] = useState("");
-
-  const [addressEtherBal, setaddressEtherBal] = useState("");
-  const [contractEtherBal, setcontractEtherBal] = useState("");
-  const [addressCCBal, setaddressCCBal] = useState("");
-  const [contractCBal, setcontractCCBal] = useState("");
+  const [donationDetails, setdonationDetails] = useState("");
 
   useEffect(() => {
-    getEventDetails();
+    getDonationDetails();
   }, []);
 
-  const getAdderssEtherBalance = async () => {
-    let balanceInWei = await props.we3Obj.eth.getBalance(
-      props.payAddress
-    );
-    let balanceInEther =
-      (await props.we3Obj.utils.fromWei(balanceInWei, "ether")) + " ETH";
-    setaddressEtherBal(balanceInEther);
-  };
+  const getDonationDetails = async () => {
+    let donationList = [];
 
-  const getContractEtherBalance = async () => {
-    let balanceInWei = await props.we3Obj.eth.getBalance(props.contractAddress);
-    let balanceInEther =
-      (await props.we3Obj.utils.fromWei(balanceInWei, "ether")) + " ETH";
-    setcontractEtherBal(balanceInEther);
-  };
+    let donationData = await axios.get("http://127.0.0.1:3001/getDonations");
+    console.log("hai", donationData.data);
 
-  const getAdderssCCBalance = async () => {
-    let ccBalance = await myContract.methods
-      .balanceOf(props.payAddress)
-      .call();
-    setaddressCCBal(ccBalance + " CC");
-  };
+    donationData.data.map((value, key) => {
+      console.log("just value",value);
+      let newdonationList = {
+        key: key,
+        slno: key,
+        name: value.emailid,
+        firstname: value.firstname,
+        lastname: value.lastname,
+        contribution: value.amount,
+        alloted: value.alloted.toString(),
+      };
+      donationList.push(newdonationList);
+    });
 
-  const getContractCCBalance = async () => {
-    let ccBalance = await myContract.methods
-      .balanceOf(props.contractAddress)
-      .call();
-    setcontractCCBal(ccBalance + " CC");
-  };
-
-  const getEventDetails = async () => {
-    console.log("Web3: ", myContract);
-    myContract.getPastEvents(
-      "SystemLog",
-      {
-        fromBlock: 0,
-        toBlock: "latest",
-      },
-      async(err, events) => {
-        console.log("====>events", events);
-        let eventDetails = [];
-
-        for (let i = 0; i < events.length; i++) {
-          let tokenValue = "Not Required";
-
-          let blockData = await props.we3Obj.eth.getBlock(events[i].blockNumber);
-          console.log(blockData);
-          var blockTime = new Date(blockData.timestamp * 1000).toISOString().slice(0, 19).replace('T', ' ')
-
-
-          if (events[i].returnValues.TokenConsumption > "0") {
-            tokenValue = events[i].returnValues.TokenConsumption;
-          }
-
-          let newEvent = {
-            key: i,
-            transactionHash: events[i].transactionHash,
-            EventAction: events[i].returnValues.EventAction,
-            EventTriggeredBy: events[i].returnValues.EventTriggeredBy,
-            TokenConsumption: tokenValue,
-            DateTime: blockTime,
-          };
-          eventDetails.push(newEvent);
-        }
-        seteventDetails(eventDetails);
-      }
-    );
+    setdonationDetails(donationList);
   };
 
   const [text1, setText1] = useState("");
@@ -159,15 +119,13 @@ export default function AdminDashBoard(props) {
 
   const cancel1 = () => {
     setOpen1(false);
-  }
+  };
 
   const handleClose1 = async () => {
     const infoValue = await myContract.methods
       .withdrawEther(text1)
       .send({ from: props.payAddress, gas: 999999 });
     console.log(infoValue);
-    getAdderssEtherBalance();
-    getContractEtherBalance();
     setOpen1(false);
   };
 
@@ -179,15 +137,17 @@ export default function AdminDashBoard(props) {
 
   const cancel2 = () => {
     setOpen2(false);
-  }
+  };
 
   const handleClose2 = async () => {
     const infoValue = await myContract.methods
       .depositeEther()
-      .send({ from: props.payAddress, gas: 999999, value: parseInt(text2) * (10 ** 18) });
+      .send({
+        from: props.payAddress,
+        gas: 999999,
+        value: parseInt(text2) * 10 ** 18,
+      });
     console.log(infoValue);
-    getContractEtherBalance();
-    getAdderssEtherBalance();
     setOpen2(false);
   };
 
@@ -199,14 +159,13 @@ export default function AdminDashBoard(props) {
 
   const cancel3 = () => {
     setOpen3(false);
-  }
+  };
 
   const handleClose3 = async () => {
     const infoValue = await myContract.methods
       .issueCC(text3)
       .send({ from: props.payAddress, gas: 999999 });
     console.log(infoValue);
-    getAdderssCCBalance();
     setOpen3(false);
   };
 
@@ -218,14 +177,13 @@ export default function AdminDashBoard(props) {
 
   const cancel4 = () => {
     setOpen4(false);
-  }
+  };
 
   const handleClose4 = async () => {
     const infoValue = await myContract.methods
       .depositeCC(text4)
       .send({ from: props.payAddress, gas: 999999 });
     console.log(infoValue);
-    getContractCCBalance();
     setOpen4(false);
   };
 
@@ -247,13 +205,12 @@ export default function AdminDashBoard(props) {
 
   return (
     <div className={classes.paper}>
-
       <Typography component="h1" variant="h5">
         Notification Log
       </Typography>
       <div style={{ height: 400, width: 900 }}>
         <Divider />
-        <Table columns={columns} dataSource={eventDetails} />
+        <Table columns={columns} dataSource={donationDetails} />
       </div>
 
       <Dialog

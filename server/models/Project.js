@@ -25,10 +25,22 @@ const ProjectSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  allocated: {
+    type: String,
+    required: true,
+  },
   completion: {
     type: String,
     required: true,
   },
+  useremaillist: {
+    type: [String],
+    required: true,
+  },
+  bundillist: {
+    type: [String],
+    required: true,
+  }
 });
 
 const ProjectModel = mongoose.model("project", ProjectSchema);

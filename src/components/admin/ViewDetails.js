@@ -11,6 +11,8 @@ import QRCode from "qrcode.react";
 import { Table, Divider } from "antd";
 import "antd/dist/antd.css";
 
+const axios = require('axios').default
+
 const columns = [
   {
     title: "Campaign ID",
@@ -51,10 +53,6 @@ const columnsT2 = [
     dataIndex: "taskLocation",
   },
   {
-    title: "Task Details",
-    dataIndex: "taskDetails",
-  },
-  {
     title: "Requirement",
     dataIndex: "taskRequirements",
   },
@@ -75,9 +73,18 @@ const columnsT3 = [
     render: (text) => <a>{text}</a>,
   },
   {
+    title: "First Name",
+    dataIndex: "firstname",
+  },
+  {
+    title: "Last Name",
+    dataIndex: "lastname",
+  },
+  {
     title: "Contribution",
     dataIndex: "contribution",
-  }
+  },
+
 ];
 
 export default function ViewDetails(props) {
@@ -94,72 +101,85 @@ export default function ViewDetails(props) {
 
   const [donationDetails, setdonationDetails] = useState([])
 
-  const getDonationDetails = async () => {
-    let donationCount = await myContract.methods.donationCount().call()
+  const getDonationDetails = async (projectid) => {
 
     let donationList = []
 
-    for (let i = 0; i < donationCount; i++) {
-      let donationdatas = await myContract.methods.donationDetails(i).call()
-      console.log(donationdatas.username, props.username)
-      // if (donationdatas.username == props.userName) {
-        let newdonationList = {
-          key: i,
-          name: donationdatas.username,
-          contribution: donationdatas.amount,
-        }
-        donationList.push(newdonationList)
-      // }
-    }
-    console.log('=======================>hai', donationList)
+    let projectData = await axios.post('http://127.0.0.1:3001/getDonationData', {
+      projectid: projectid,
+    })
+    console.log(projectData.data)
+
+    projectData.data.map((value, key) => {
+      console.log(value[0])
+      let newdonationList = {
+              key: key,
+              name: value[0].emailid,
+              firstname: value[0].firstname,
+              lastname: value[0].lastname,
+              contribution: value[0].amount,
+            }
+            donationList.push(newdonationList)
+    })
+
+
+    // for (let i = 0; i < donationCount; i++) {
+    //   let donationdatas = await myContract.methods.donationDetails(i).call()
+    //   console.log(donationdatas.username, props.username)
+    //   // if (donationdatas.username == props.userName) {
+    //     let newdonationList = {
+    //       key: i,
+    //       name: donationdatas.username,
+    //       contribution: donationdatas.amount,
+    //     }
+    //     donationList.push(newdonationList)
+    //   // }
+    // }
+    // console.log('=======================>hai', donationList)
     setdonationDetails(donationList)
   }
 
   const getCampaignDetails = async () => {
-    let campaignCount = await myContract.methods.campaignCount().call();
-
     let campaignList = [];
 
-    for (let i = 0; i < campaignCount; i++) {
-      let campaigndatas = await myContract.methods.campaignDetails(i).call();
+    let campaginData = await axios.get('http://127.0.0.1:3001/getCampagins')
+
+    campaginData.data.map((value, key) => {
       let newcampaignList = {
-        key: i,
-        idCapaign: i,
-        nameCapaign: campaigndatas.name,
-        startDate: campaigndatas.startDate,
-        endDate: campaigndatas.endDate,
-        details: campaigndatas.details,
+        key: key,
+        idCapaign: value.campaginid,
+        nameCapaign: value.campaginname,
+        startDate: value.startdata,
+        endDate: value.enddate,
+        details: value.details,
       };
       campaignList.push(newcampaignList);
-    }
-    console.log("=======================>hai", campaignList);
+    })
+    // console.log("=======================>hai", campaignList);
     setCompaignList(campaignList);
   };
 
   const getTaskDetails = async (campainID) => {
-    let taskList = await myContract.methods
-      .getTaskUnderCampaign(campainID)
-      .call();
-    // console.log("CarData: ", cardatas);
-    // let componentList = cardatas[3];
-    // console.log(componentList);
+    let projectData = await axios.post('http://127.0.0.1:3001/findProject', {
+      campaginid: campainID,
+    })
+
+    console.log("Project Data: ", projectData)
+
     let taskDetailsList = [];
 
-    for (let i = 0; i < taskList.length; i++) {
-      let taskdata = await myContract.methods.taskDetails(taskList[i]).call();
-      console.log("+++++++++", taskdata);
+    projectData.data.map((value, key) => {
       let newTask = {
-        key: i,
-        idTask: taskList[i],
-        taskName: taskdata.taskName,
-        taskLocation: taskdata.taskLocation,
-        taskDetails: taskdata.taskDetails,
-        taskRequirements: taskdata.requiredAmount,
-        taskAllocation: taskdata.requiredAmount,
-        taskCompletion: taskdata.progress,
+        key: key,
+        idTask: value.projectid,
+        taskName: value.projectname,
+        taskLocation: value.location,
+        taskRequirements: value.budget,
+        taskAllocation: value.allocated,
+        taskCompletion: value.completion,
       };
       taskDetailsList.push(newTask);
-    }
+    })
 
     settaskDetails(taskDetailsList);
   };
@@ -177,7 +197,7 @@ export default function ViewDetails(props) {
     onChange: (selectedRowKeys, selectedRows) => {
       let taskID = selectedRows[0].idTask;
       console.log("table", selectedRows[0].idTask);
-      getDonationDetails();
+      getDonationDetails(taskID);
     },
   };
 

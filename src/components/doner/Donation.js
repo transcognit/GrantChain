@@ -9,29 +9,28 @@ import { Select, MenuItem } from '@material-ui/core'
 import Snackbar from '@material-ui/core/Snackbar'
 import MuiAlert from '@material-ui/lab/Alert'
 
+const axios = require('axios').default
+
 export default function Donation(props) {
-  const myContract = props.myContractObj
-  const ethereum = window.ethereum
+  // const myContract = props.myContractObj
+  // const ethereum = window.ethereum
 
-  const [compaignList, setCompaignList] = useState([])
+  // const [compaignList, setCompaignList] = useState([])
 
-  useEffect(() => {
-    getCampaignList()
-  }, [])
+  // useEffect(() => {
+  //   getCampaignList()
+  // }, [])
 
-  const getCampaignList = async () => {
-    let campaignCount = await myContract.methods.campaignCount().call()
+  // const getCampaignList = async () => {
+  //   let campaignList = []
 
-    let campaignList = []
+  //   let response = await axios.get('http://127.0.0.1:3001/getCampagins')
 
-    for (let i = 0; i < campaignCount; i++) {
-      let campaigndatas = await myContract.methods.campaignDetails(i).call()
-      let newcampaignList = [i, campaigndatas.name]
-      campaignList.push(newcampaignList)
-    }
-    console.log('=======================>hai', props.userName)
-    setCompaignList(campaignList)
-  }
+  //   campaignList = response.data
+
+  //   console.log('=======================>hai', campaignList)
+  //   setCompaignList(campaignList)
+  // }
 
   function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />
@@ -57,17 +56,22 @@ export default function Donation(props) {
   }))
   const classes = useStyles()
 
-  const [nameofcampaign, setnameofcampaign] = useState('Select')
-  const [idofcampaign, setidofcampaign] = useState()
+  // const [nameofcampaign, setnameofcampaign] = useState('Select')
+  // const [idofcampaign, setidofcampaign] = useState()
+  const [firstname, setfirstname] = useState()
+  const [secondname, setsecondname] = useState()
   const [amount, setAmount] = useState()
 
   const submitHandler = async (event) => {
     event.preventDefault()
-    let campaigndatas = await myContract.methods.campaignDetails(idofcampaign).call();
-    const infoValue = await myContract.methods
-      .newDonation(props.userName, campaigndatas.name, idofcampaign, amount)
-      .send({ from: props.payAddress, gas: 999999 })
-    console.log(infoValue);
+
+    await axios.post('http://127.0.0.1:3001/createDonation', {
+      emailid: props.userName,
+      firstname: firstname,
+      lastname: secondname,
+      amount: amount,
+      alloted: false
+    })
 
     setOpen(true)
   }
@@ -79,8 +83,17 @@ export default function Donation(props) {
     setOpen(false)
   }
 
-  const compaignChangeHandler = (event) => {
-    setidofcampaign(event.target.value)
+  // const compaignChangeHandler = (event) => {
+  //   setidofcampaign(event.target.value)
+  //   console.log(event.target.value)
+  // }
+
+  const firstnameHandler = (event) => {
+    setfirstname(event.target.value)
+  }
+
+  const secondnameHandler = (event) => {
+    setsecondname(event.target.value)
   }
 
   const amountChangeHandler = (event) => {
@@ -95,7 +108,7 @@ export default function Donation(props) {
         </Typography>
         <br />
         <form noValidate onSubmit={submitHandler}>
-          <Select
+          {/* <Select
             labelId="nameofcampaign"
             id="nameofcampaign"
             value={idofcampaign ?? 'Select'}
@@ -106,11 +119,35 @@ export default function Donation(props) {
             className={classes.input}
           >
             {compaignList.map((data) => (
-              <MenuItem key={data[0]} value={data[0]}>
-                {data[1]}
+              <MenuItem key={data.campaginid} value={data.campaginid}>
+                {data.campaginname}
               </MenuItem>
             ))}
-          </Select>
+          </Select> */}
+
+          <TextField
+            variant="outlined"
+            required
+            fullWidth
+            id="firstname"
+            label="First Name (Will be shown in certificate)"
+            name="firstname"
+            autoComplete="firstname"
+            onChange={firstnameHandler}
+            className={classes.input}
+          />
+
+          <TextField
+            variant="outlined"
+            required
+            fullWidth
+            id="secondname"
+            label="Last Name (Will be shown in certificate)"
+            name="secondname"
+            autoComplete="secondname"
+            onChange={secondnameHandler}
+            className={classes.input}
+          />
 
           <TextField
             variant="outlined"
